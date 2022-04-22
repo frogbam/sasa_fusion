@@ -465,7 +465,7 @@ class PointNet2FSMSGFU(nn.Module):
         low_feature = feature512_from_4096.permute(0,2,1).contiguous()
 
         fused_feature = self.FU_module(high_feature=high_feature, low_feature=low_feature)
-        print(fused_feature.shape)
+
 
 
 
