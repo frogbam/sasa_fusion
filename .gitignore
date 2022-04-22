@@ -3,6 +3,8 @@
 **egg-info**
 data/nuscenes
 data/kitti/gt_database
+data/kitti/testing
+data/kitti/training
 data/kitti/gt_database_trainval
 output/
 spconv/
