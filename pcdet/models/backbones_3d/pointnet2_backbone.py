@@ -451,7 +451,7 @@ class PointNet2FSMSGFU(nn.Module):
         feature512_from_4096 = torch.tensor([])
 
         l_tmp =[]
-        for batch in range(4):
+        for batch in range(len(l_features[1])):
             idx_table = sample1024[batch][sample512[batch].tolist()].tolist()
             l_tmp.append(feature4096[batch][:, idx_table])
 
