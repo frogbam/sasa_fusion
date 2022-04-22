@@ -1,7 +1,9 @@
 **__pycache__**
 **build**
 **egg-info**
-data/
+data/nuscenes
+data/kitti/gt_database
+data/kitti/gt_database_trainval
 output/
 spconv/
 tools/cfgs/experiments/
@@ -15,4 +17,5 @@ venv/
 *.pkl
 *.zip
 *.bin
+*.pkl
 version.py
