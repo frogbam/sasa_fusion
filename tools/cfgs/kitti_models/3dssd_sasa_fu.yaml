@@ -75,8 +75,8 @@ MODEL:
             DILATED_RADIUS_GROUP: True
         
         FUSION_CAT:
-            FUSION_LOW_MLP: [256, 128, 64]
-            FUSION_HIGH_MLP: [256, 512, 256]
+            FUSION_LOW_MLP: [128, 64]
+            FUSION_HIGH_MLP: [256, 256]
 
             
 
@@ -147,7 +147,7 @@ MODEL:
 
 OPTIMIZATION:
     BATCH_SIZE_PER_GPU: 4
-    NUM_EPOCHS: 120
+    NUM_EPOCHS: 60
 
     OPTIMIZER: adam_onecycle
     LR: 0.01
@@ -161,7 +161,7 @@ OPTIMIZATION:
     LR_DECAY: 0.1
     LR_CLIP: 0.0000001
 
-    LR_WARMUP: False
+    LR_WARMUP: True
     WARMUP_EPOCH: 1
 
     GRAD_NORM_CLIP: 10
