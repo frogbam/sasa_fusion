@@ -48,7 +48,7 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, dist_test=False, sa
                 model,
                 device_ids=[local_rank],
                 broadcast_buffers=False,
-                find_unused_parameters=True,
+                # find_unused_parameters=True,
         )
     model.eval()
 
