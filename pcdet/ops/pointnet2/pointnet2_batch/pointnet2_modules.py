@@ -478,7 +478,7 @@ class PointnetFPModule(nn.Module):
         return new_features.squeeze(-1)
 
 class FusionModule(nn.Module):
-    def __init__(self, *, fusion_high_mlp: List[int], fusion_low_mlp: List[int], bn: bool = True):
+    def __init__(self, *, fusion_high_mlp: List[int], fusion_low_mlp: List[int], fusion_comp_mlp: List[int], bn: bool = True):
         """
         :param mlp: list of int
         :param bn: whether to use batchnorm
@@ -538,6 +538,34 @@ class FusionModule(nn.Module):
             output_features = fusion_low_mlp[k]
         self.fusion_low_mlp = nn.Sequential(*low_mlp)
 
+        comp_mlp = []
+        for k in range(len(fusion_comp_mlp)):
+            if k == len(fusion_comp_mlp) -1:
+                comp_mlp.extend([
+                    nn.Linear(in_features=output_features, out_features=fusion_comp_mlp[k], bias=True),
+                    nn.Sigmoid(),
+                ])
+            
+            elif k == 0:
+                comp_mlp.extend([
+                    nn.Linear(in_features=320, out_features=fusion_comp_mlp[k], bias=True),
+                    nn.BatchNorm1d(512),
+                    nn.ReLU(),
+                ])
+                            
+
+            else: 
+                comp_mlp.extend([
+                    nn.Linear(in_features=output_features, out_features=fusion_comp_mlp[k], bias=True),
+                    nn.BatchNorm1d(512),
+                    nn.ReLU(),
+                ])
+            
+            output_features = fusion_comp_mlp[k]
+        self.fusion_comp_mlp = nn.Sequential(*comp_mlp)
+
+
+
     def forward(self, high_feature: torch.Tensor, low_feature: torch.Tensor) -> torch.Tensor:
 
         
@@ -553,7 +581,9 @@ class FusionModule(nn.Module):
 
         fused_feature = torch.cat((masked_low_feature, masked_high_feature), 2)
 
-        return fused_feature
+        fused_comp_feature = self.fusion_comp_mlp(fused_feature)
+
+        return fused_comp_feature
         
 if __name__ == "__main__":
     pass

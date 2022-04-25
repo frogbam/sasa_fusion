@@ -77,6 +77,7 @@ MODEL:
         FUSION_CAT:
             FUSION_LOW_MLP: [128, 128, 64]
             FUSION_HIGH_MLP: [256, 256, 256]
+            COMPRESS_MLP: [256, 256]
 
             
 

@@ -367,8 +367,9 @@ class PointNet2FSMSGFU(nn.Module):
 
         fusion_high_mlp = self.model_cfg.FUSION_CAT.FUSION_HIGH_MLP
         fusion_low_mlp = self.model_cfg.FUSION_CAT.FUSION_LOW_MLP
+        fusion_comp_mlp = self.model_cfg.FUSION_CAT.COMPRESS_MLP
 
-        self.FU_module = pointnet2_modules.FusionModule(fusion_high_mlp=fusion_high_mlp, fusion_low_mlp=fusion_low_mlp)
+        self.FU_module = pointnet2_modules.FusionModule(fusion_high_mlp=fusion_high_mlp, fusion_low_mlp=fusion_low_mlp, fusion_comp_mlp=fusion_comp_mlp)
     
         
         print('::::::::', self.SA_modules)
@@ -456,22 +457,16 @@ class PointNet2FSMSGFU(nn.Module):
             l_tmp.append(feature4096[batch][:, idx_table])
 
         feature512_from_4096 = torch.stack(l_tmp)
-        # print(feature512_from_4096.shape)
-        # print(l_features[3].shape)
 
 
-        # fused_feature = pointnet2_modules.FusionModule(l_features[3], feature512_from_4096)
         high_feature = l_features[3].permute(0, 2, 1).contiguous() 
         low_feature = feature512_from_4096.permute(0,2,1).contiguous()
 
         fused_feature = self.FU_module(high_feature=high_feature, low_feature=low_feature)
 
 
-
-
-
-
-        point_features = l_features[i - 1].permute(0, 2, 1).contiguous()  # (B, N, C)
+        # point_features = l_features[i - 1].permute(0, 2, 1).contiguous()  # (B, N, C)
+        point_features = fused_feature
         batch_dict['point_features'] = point_features.view(-1, point_features.shape[-1])
         batch_dict['point_coords'] = torch.cat((
             batch_idx[:, :l_xyz[i - 1].size(1)].reshape(-1, 1).float(),
