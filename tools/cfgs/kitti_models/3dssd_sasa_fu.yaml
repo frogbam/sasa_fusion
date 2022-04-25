@@ -7,7 +7,7 @@ DATA_CONFIG:
         DISABLE_AUG_LIST: ['placeholder']
         AUG_CONFIG_LIST:
             -   NAME: gt_sampling
-                USE_ROAD_PLANE: False
+                USE_ROAD_PLANE: True
                 DB_INFO_PATH:
                     - kitti_dbinfos_train.pkl
                 PREPARE: {
@@ -75,8 +75,8 @@ MODEL:
             DILATED_RADIUS_GROUP: True
         
         FUSION_CAT:
-            FUSION_LOW_MLP: [128, 128, 64, 64]
-            FUSION_HIGH_MLP: [256, 256, 256, 256]
+            FUSION_LOW_MLP: [128, 128, 64]
+            FUSION_HIGH_MLP: [256, 256, 256]
 
             
 
