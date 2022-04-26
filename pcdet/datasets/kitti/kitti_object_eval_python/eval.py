@@ -272,6 +272,8 @@ def compute_statistics_jit(overlaps,
                 similarity = np.sum(tmp)
             else:
                 similarity = -1
+
+    
     return tp, fp, fn, similarity, thresholds[:thresh_idx]
 
 
@@ -550,6 +552,7 @@ def eval_class(gt_annos,
         "precision": precision,
         "orientation": aos,
     }
+
     return ret_dict
 
 

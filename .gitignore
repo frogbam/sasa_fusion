@@ -10,6 +10,8 @@ output/
 spconv/
 tools/cfgs/experiments/
 tools/cfgs/cluster/
+tensorboard_sasa/
+tensorboard_sasaf/
 *.pyc
 venv/
 *.idea/
