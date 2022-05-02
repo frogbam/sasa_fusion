@@ -637,22 +637,15 @@ class FusionModule2(nn.Module):
 
 
     def forward(self, high_feature: torch.Tensor, low_feature: torch.Tensor) -> torch.Tensor:
-        
-        print(high_feature.shape)
-        print(low_feature.shape)
 
 
         
         concated = torch.cat((high_feature, low_feature), 1)
-        print(concated.shape)
 
 
         
         low_mask = self.fusion_low_mlp(concated)
         high_mask = self.fusion_high_mlp(concated)
-
-        print(low_mask.shape)
-        print(high_mask.shape)
 
 
 
@@ -668,7 +661,7 @@ class FusionModule2(nn.Module):
 
         fused_comp_feature = self.fusion_comp_mlp(fused_feature)
 
-        print(fused_comp_feature.shape)
+
 
 
 
