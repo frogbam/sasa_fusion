@@ -1,3 +1,4 @@
+from re import I
 import torch
 import torch.nn as nn
 
@@ -369,7 +370,7 @@ class PointNet2FSMSGFU(nn.Module):
         fusion_low_mlp = self.model_cfg.FUSION_CAT.FUSION_LOW_MLP
         fusion_comp_mlp = self.model_cfg.FUSION_CAT.COMPRESS_MLP
 
-        self.FU_module = pointnet2_modules.FusionModule(fusion_high_mlp=fusion_high_mlp, fusion_low_mlp=fusion_low_mlp, fusion_comp_mlp=fusion_comp_mlp)
+        self.FU_module = pointnet2_modules.FusionModule2(fusion_high_mlp=fusion_high_mlp, fusion_low_mlp=fusion_low_mlp, fusion_comp_mlp=fusion_comp_mlp)
     
         
         print('::::::::', self.SA_modules)
@@ -382,7 +383,7 @@ class PointNet2FSMSGFU(nn.Module):
         return batch_idx, xyz, features
 
     def forward(self, batch_dict):
-
+        
         """
         Args:
             batch_dict:
@@ -442,7 +443,6 @@ class PointNet2FSMSGFU(nn.Module):
         else:  # take l_xyz[i - 1] and l_features[i - 1]
             i = 0
 
-
         # get feature 512 from feature 4096 
         feature4096 = l_features[1]
 
@@ -459,14 +459,23 @@ class PointNet2FSMSGFU(nn.Module):
         feature512_from_4096 = torch.stack(l_tmp)
 
 
-        high_feature = l_features[3].permute(0, 2, 1).contiguous() 
-        low_feature = feature512_from_4096.permute(0,2,1).contiguous()
+        # # if FusionModuleV1
+        # high_feature = l_features[3].permute(0, 2, 1).contiguous() 
+        # low_feature = feature512_from_4096.permute(0,2,1).contiguous()
+
+        # if FusionModuleV2
+        high_feature = l_features[3]
+        low_feature = feature512_from_4096
 
         fused_feature = self.FU_module(high_feature=high_feature, low_feature=low_feature)
 
 
-        # point_features = l_features[i - 1].permute(0, 2, 1).contiguous()  # (B, N, C)
-        point_features = fused_feature
+        # # if FusionModuleV1
+        # point_features = fused_feature
+
+        # if FusionModuleV2
+        point_features = fused_feature.permute(0, 2, 1).contiguous()  # (B, N, C)
+
         batch_dict['point_features'] = point_features.view(-1, point_features.shape[-1])
         batch_dict['point_coords'] = torch.cat((
             batch_idx[:, :l_xyz[i - 1].size(1)].reshape(-1, 1).float(),

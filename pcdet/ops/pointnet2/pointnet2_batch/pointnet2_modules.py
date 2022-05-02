@@ -584,6 +584,95 @@ class FusionModule(nn.Module):
         fused_comp_feature = self.fusion_comp_mlp(fused_feature)
 
         return fused_comp_feature
+
+
+class FusionModule2(nn.Module):
+    def __init__(self, *, fusion_high_mlp: List[int], fusion_low_mlp: List[int], fusion_comp_mlp: List[int], bn: bool = True):
+        """
+        :param mlp: list of int
+        :param bn: whether to use batchnorm
+        """
+        super().__init__()
+
+        out_channels = 320
+
+
+        shared_mlp = []
+        for k in range(len(fusion_high_mlp)):
+            shared_mlp.extend([
+                nn.Conv1d(out_channels, fusion_high_mlp[k], kernel_size=1, bias=False),
+                nn.BatchNorm1d(fusion_high_mlp[k]),
+                nn.ReLU()
+            ])
+            out_channels = fusion_high_mlp[k]
+        self.fusion_high_mlp = nn.Sequential(*shared_mlp)
+
+
+        out_channels = 320
+
+
+        shared_mlp = []
+        for k in range(len(fusion_low_mlp)):
+            shared_mlp.extend([
+                nn.Conv1d(out_channels, fusion_low_mlp[k], kernel_size=1, bias=False),
+                nn.BatchNorm1d(fusion_low_mlp[k]),
+                nn.ReLU()
+            ])
+            out_channels = fusion_low_mlp[k]
+        self.fusion_low_mlp = nn.Sequential(*shared_mlp)
+
+
+
+        out_channels = 320
+
+        shared_mlp = []
+        for k in range(len(fusion_comp_mlp)):
+            shared_mlp.extend([
+                nn.Conv1d(out_channels, fusion_comp_mlp[k], kernel_size=1, bias=False),
+                nn.BatchNorm1d(fusion_comp_mlp[k]),
+                nn.ReLU()
+            ])
+            out_channels = fusion_comp_mlp[k]
+        self.fusion_comp_mlp = nn.Sequential(*shared_mlp)
+
+
+    def forward(self, high_feature: torch.Tensor, low_feature: torch.Tensor) -> torch.Tensor:
+        
+        print(high_feature.shape)
+        print(low_feature.shape)
+
+
+        
+        concated = torch.cat((high_feature, low_feature), 1)
+        print(concated.shape)
+
+
+        
+        low_mask = self.fusion_low_mlp(concated)
+        high_mask = self.fusion_high_mlp(concated)
+
+        print(low_mask.shape)
+        print(high_mask.shape)
+
+
+
+        masked_low_feature = torch.multiply(low_feature, low_mask)
+        masked_high_feature = torch.multiply(high_feature, high_mask)
+
+
+
+
+        fused_feature = torch.cat((masked_low_feature, masked_high_feature), 1)
+
+
+
+        fused_comp_feature = self.fusion_comp_mlp(fused_feature)
+
+        print(fused_comp_feature.shape)
+
+
+
+        return fused_comp_feature
         
 if __name__ == "__main__":
     pass
