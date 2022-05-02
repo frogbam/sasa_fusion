@@ -444,6 +444,7 @@ class PointNet2FSMSGFU(nn.Module):
             i = 0
 
         # get feature 512 from feature 4096 
+
         feature4096 = l_features[1]
 
         sample512 = l_samples[2]
@@ -453,7 +454,7 @@ class PointNet2FSMSGFU(nn.Module):
 
         l_tmp =[]
         for batch in range(len(l_features[1])):
-            idx_table = sample1024[batch][sample512[batch].tolist()].tolist()
+            idx_table = sample1024[batch][sample512[batch].long()].long()
             l_tmp.append(feature4096[batch][:, idx_table])
 
         feature512_from_4096 = torch.stack(l_tmp)
@@ -466,6 +467,7 @@ class PointNet2FSMSGFU(nn.Module):
         # if FusionModuleV2
         high_feature = l_features[3]
         low_feature = feature512_from_4096
+
 
         fused_feature = self.FU_module(high_feature=high_feature, low_feature=low_feature)
 
