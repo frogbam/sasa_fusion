@@ -31,7 +31,7 @@ MODEL:
     NAME: 3DSSD
 
     BACKBONE_3D:
-        NAME: PointNet2FSMSG
+        NAME: PointNet2FSMSGFU
         SA_CONFIG:
             NPOINT_LIST: [[4096, 12288], [1024, 1024, 2048], [1024, 2048], [1024, 1024]]
             SAMPLE_RANGE_LIST: [[[0, 16384], [16384, 65536]], [[0, 4096], [0, 4096], [4096, 16384]], [[0, 4096], [0, 4096]], [[0, 3072], [0, 3072]]]
@@ -46,6 +46,11 @@ MODEL:
             CONFIDENCE_MLPS: [[32], [64], [128], []]
             WEIGHT_GAMMA: 1.0
             DILATED_RADIUS_GROUP: True
+  
+        FUSION_CAT:
+            FUSION_LOW_MLP: [128, 64]
+            FUSION_HIGH_MLP: [256, 256]
+            COMPRESS_MLP: [256, 256]
 
     POINT_HEAD:
         NAME: PointHeadVoteFu

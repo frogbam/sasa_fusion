@@ -383,7 +383,7 @@ class PointNet2FSMSGFU(nn.Module):
         return batch_idx, xyz, features
 
     def forward(self, batch_dict):
-        
+
         """
         Args:
             batch_dict:
@@ -445,6 +445,7 @@ class PointNet2FSMSGFU(nn.Module):
 
         # get feature 512 from feature 4096 
 
+
         feature4096 = l_features[1]
 
         sample512 = l_samples[2]
@@ -470,7 +471,6 @@ class PointNet2FSMSGFU(nn.Module):
 
 
         fused_feature = self.FU_module(high_feature=high_feature, low_feature=low_feature)
-
 
         # # if FusionModuleV1
         # point_features = fused_feature
