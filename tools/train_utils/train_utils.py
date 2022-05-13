@@ -14,48 +14,50 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
     if rank == 0:
         pbar = tqdm.tqdm(total=total_it_each_epoch, leave=leave_pbar, desc='train', dynamic_ncols=True)
 
-    for cur_it in range(total_it_each_epoch):
-        try:
-            batch = next(dataloader_iter)
-        except StopIteration:
-            dataloader_iter = iter(train_loader)
-            batch = next(dataloader_iter)
-            print('new iters')
+    with torch.autograd.set_detect_anomaly(True):
+        for cur_it in range(total_it_each_epoch):
+            try:
+                batch = next(dataloader_iter)
+            except StopIteration:
+                dataloader_iter = iter(train_loader)
+                batch = next(dataloader_iter)
+                print('new iters')
 
-        lr_scheduler.step(accumulated_iter)
+            lr_scheduler.step(accumulated_iter)
 
-        try:
-            cur_lr = float(optimizer.lr)
-        except:
-            cur_lr = optimizer.param_groups[0]['lr']
-
-        if tb_log is not None:
-            tb_log.add_scalar('meta_data/learning_rate', cur_lr, accumulated_iter)
-
-        model.train()
-        optimizer.zero_grad()
-
-        loss, tb_dict, disp_dict = model_func(model, batch)
-
-        loss.backward()
-        clip_grad_norm_(model.parameters(), optim_cfg.GRAD_NORM_CLIP)
-        optimizer.step()
-
-        accumulated_iter += 1
-        disp_dict.update({'loss': loss.item(), 'lr': cur_lr})
-
-        # log to console and tensorboard
-        if rank == 0:
-            pbar.update()
-            pbar.set_postfix(dict(total_it=accumulated_iter))
-            tbar.set_postfix(disp_dict)
-            tbar.refresh()
+            try:
+                cur_lr = float(optimizer.lr)
+            except:
+                cur_lr = optimizer.param_groups[0]['lr']
 
             if tb_log is not None:
-                tb_log.add_scalar('train/loss', loss, accumulated_iter)
                 tb_log.add_scalar('meta_data/learning_rate', cur_lr, accumulated_iter)
-                for key, val in tb_dict.items():
-                    tb_log.add_scalar('train/' + key, val, accumulated_iter)
+
+            model.train()
+            optimizer.zero_grad()
+
+            loss, tb_dict, disp_dict = model_func(model, batch)
+
+
+            loss.backward()
+            clip_grad_norm_(model.parameters(), optim_cfg.GRAD_NORM_CLIP)
+            optimizer.step()
+
+            accumulated_iter += 1
+            disp_dict.update({'loss': loss.item(), 'lr': cur_lr})
+
+            # log to console and tensorboard
+            if rank == 0:
+                pbar.update()
+                pbar.set_postfix(dict(total_it=accumulated_iter))
+                tbar.set_postfix(disp_dict)
+                tbar.refresh()
+
+                if tb_log is not None:
+                    tb_log.add_scalar('train/loss', loss, accumulated_iter)
+                    tb_log.add_scalar('meta_data/learning_rate', cur_lr, accumulated_iter)
+                    for key, val in tb_dict.items():
+                        tb_log.add_scalar('train/' + key, val, accumulated_iter)
     if rank == 0:
         pbar.close()
     return accumulated_iter

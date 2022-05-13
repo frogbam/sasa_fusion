@@ -444,7 +444,7 @@ class PointNet2FSMSGFU(nn.Module):
             i = 0
 
         # get feature 512 from feature 4096 
-
+    
 
         feature4096 = l_features[1]
 

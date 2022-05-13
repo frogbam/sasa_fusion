@@ -638,35 +638,33 @@ class FusionModule2(nn.Module):
 
     def forward(self, high_feature: torch.Tensor, low_feature: torch.Tensor) -> torch.Tensor:
 
-        with torch.autograd.set_detect_anomaly(True):
+        
+        concated = torch.cat((high_feature, low_feature), 1)
+
 
         
-            concated = torch.cat((high_feature, low_feature), 1)
-
-
-            
-            low_mask = self.fusion_low_mlp(concated)
-            high_mask = self.fusion_high_mlp(concated)
+        low_mask = self.fusion_low_mlp(concated)
+        high_mask = self.fusion_high_mlp(concated)
 
 
 
-            masked_low_feature = torch.multiply(low_feature, low_mask)
-            masked_high_feature = torch.multiply(high_feature, high_mask)
+        masked_low_feature = torch.multiply(low_feature, low_mask)
+        masked_high_feature = torch.multiply(high_feature, high_mask)
 
 
 
 
-            fused_feature = torch.cat((masked_low_feature, masked_high_feature), 1)
+        fused_feature = torch.cat((masked_low_feature, masked_high_feature), 1)
 
 
 
-            fused_comp_feature = self.fusion_comp_mlp(fused_feature)
+        fused_comp_feature = self.fusion_comp_mlp(fused_feature)
 
 
 
 
 
-            return fused_comp_feature
+        return fused_comp_feature
         
 if __name__ == "__main__":
     pass
